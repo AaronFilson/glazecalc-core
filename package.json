@@ -1,3 +1,51 @@
 {
-  "type": "module"
+  "name": "@glazecalc/core",
+  "version": "0.1.0",
+  "description": "Glaze chemistry with no state, no tables and no words: unity formulas, fitting, limits, cone fit, swaps, Solve, blends, density and cost, each taking its host.",
+  "license": "MIT",
+  "author": "Aaron Filson / Candling Development Studio",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AaronFilson/glazecalc-core.git"
+  },
+  "homepage": "https://github.com/AaronFilson/glazecalc-core#readme",
+  "type": "module",
+  "exports": {
+    ".": "./index.ts",
+    "./chemistry": "./chemistry/index.ts",
+    "./recipe": "./recipe/index.ts",
+    "./recipe/basics": "./recipe/basics/index.ts",
+    "./cones": "./cones/index.ts",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "**/*.ts",
+    "!test/**",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=24.15.0"
+  },
+  "scripts": {
+    "test": "node --test --experimental-test-coverage --test-coverage-exclude=\"test/**\" --test-coverage-exclude=\"scripts/**\" --test-coverage-lines=99 --test-coverage-branches=98 --test-coverage-functions=99 \"test/*.test.js\"",
+    "typecheck": "tsc -p . && npm run typecheck:7",
+    "typecheck:7": "node node_modules/typescript7/bin/tsc -p .",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check:outputs": "node scripts/outputs.mjs",
+    "check:engines": "node scripts/outputs.mjs --engines"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "esbuild": "0.28.2",
+    "eslint": "10.14.0",
+    "globals": "17.14.0",
+    "prettier": "3.9.10",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.72.1",
+    "typescript7": "npm:typescript@7.0.2"
+  }
 }

@@ -1,0 +1,90 @@
+name: CI
+
+# Every push to main and every pull request: the tests with their coverage threshold, TypeScript 6 and 7, lint
+# and format, the output snapshot, the same outputs in three engines, and a scan of the history for secrets.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  checks:
+    name: Tests, types, lint, outputs
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - name: Tests, with the coverage threshold
+        run: npm test
+      - name: TypeScript 6 and 7
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Formatting
+        run: npm run format:check
+      - name: Every output as kept
+        run: npm run check:outputs
+      - name: No known vulnerabilities in the tools
+        run: npm audit --audit-level=high
+
+  engines:
+    name: The same outputs in three engines
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: package-lock.json
+      - run: npm ci --no-audit --no-fund
+      # esvu installs the engines' current builds.
+      - name: Install JavaScriptCore and SpiderMonkey
+        run: |
+          npx --yes esvu@1.3.2 install jsc
+          npx --yes esvu@1.3.2 install spidermonkey
+      - name: Node, JavaScriptCore and SpiderMonkey
+        run: npm run check:engines
+
+  secrets:
+    name: No secrets in the history
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      # gitleaks, pinned by digest, over every commit (merges too: -m) and the files as they are. The checkout
+      # belongs to the runner's user, not the container's, so git there is told the folder is safe; and the step
+      # fails unless commits were read, since a scan that read none would also say "no leaks found".
+      - name: gitleaks
+        run: |
+          docker run --rm -v "$PWD":/repo:ro --entrypoint sh zricethezav/gitleaks@sha256:c00b6bd0aeb3071cbcb79009cb16a60dd9e0a7c60e2be9ab65d25e6bc8abbb7f -c '
+            set -e
+            git config --global --add safe.directory /repo
+            status=0
+            gitleaks git /repo --log-opts="-m --all" --redact --no-banner --no-color > /tmp/scan 2>&1 || status=$?
+            cat /tmp/scan
+            test "$status" -eq 0
+            grep -Eq "INF [1-9][0-9]* commits scanned" /tmp/scan
+            gitleaks dir /repo --redact --no-banner --no-color'

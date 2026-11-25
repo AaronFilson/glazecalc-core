@@ -1,0 +1,21 @@
+# Weekly pull requests for the tools' and the workflows' updates; CI tests each one. The library itself has no
+# dependencies: these are its development tools.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    # Each release is proposed once it is a week old, so a hijacked one is usually found and pulled before it
+    # gets here. Security updates do not wait.
+    cooldown:
+      default-days: 7
+    groups:
+      lint-and-format:
+        patterns: ['eslint', '@eslint/*', 'typescript-eslint', 'globals', 'prettier']
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    cooldown:
+      default-days: 7

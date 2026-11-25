@@ -1,21 +1,21 @@
 # The chemistry core
 
-Glaze chemistry with no state, no tables and no words (docs/adr/0030-nameless-chemistry-core.md,
-docs/adr/0031-functional-core.md). It works out unity formulas, fits and selects materials, checks a recipe
+Glaze chemistry with no state, no tables and no words (Glazecalc's [ADR 30](https://github.com/AaronFilson/glazecalc/blob/master/docs/adr/0030-nameless-chemistry-core.md) and
+[ADR 31](https://github.com/AaronFilson/glazecalc/blob/master/docs/adr/0031-functional-core.md)). It works out unity formulas, fits and selects materials, checks a recipe
 against limits and its cone, finds swaps, solves for a target, blends, and works out density, cost and slurry.
 It knows no material by name and keeps nothing between calls: what it needs comes with each call.
 
 ## Importing
 
-Import from an index, never a file inside the library (an ESLint rule holds Glazecalc to this):
+Import from an index, never a file inside the library (Glazecalc holds itself to this with an ESLint rule):
 
-| Index                             | What it has                                                                                                                                                                    |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `lib/core/index.ts`               | the host's shape, identities, problems, traits and record types; each area as a namespace (`chemistry`, `recipe`, `cones`), since a name such as `unityOf` is in more than one |
-| `lib/core/chemistry/index.ts`     | unity formulas, fitting and selecting, oxides, lead, expansion                                                                                                                 |
-| `lib/core/recipe/index.ts`        | everything about recipes                                                                                                                                                       |
-| `lib/core/recipe/basics/index.ts` | a finer index: plain numbers, the record shape, amounts, a recipe's materials, density                                                                                         |
-| `lib/core/cones/index.ts`         | firing blocks and the cone charts' order, bands and conversions                                                                                                                |
+| Index                    | What it has                                                                                                                                                                    |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `index.ts`               | the host's shape, identities, problems, traits and record types; each area as a namespace (`chemistry`, `recipe`, `cones`), since a name such as `unityOf` is in more than one |
+| `chemistry/index.ts`     | unity formulas, fitting and selecting, oxides, lead, expansion                                                                                                                 |
+| `recipe/index.ts`        | everything about recipes                                                                                                                                                       |
+| `recipe/basics/index.ts` | a finer index: plain numbers, the record shape, amounts, a recipe's materials, density                                                                                         |
+| `cones/index.ts`         | firing blocks and the cone charts' order, bands and conversions                                                                                                                |
 
 A CommonJS `require` of an index takes all of it into a bundle, so the finer indexes let a page take only what
 it needs.
@@ -31,7 +31,7 @@ arguments always give the same answer, in any realm: a page, a worker, a test.
 - **Tables**: `oxides`, `cones`, `limits`, `stull`, `densities`, `expansion`.
 - **Policy**: the markets each region's library also lists, and cone fit's margins and cut-offs.
 
-The catalog (`lib/catalog`) has Glazecalc's tables; a host may bring its own.
+The catalog ([glazecalc-catalog](https://github.com/AaronFilson/glazecalc-catalog)) has Glazecalc's tables; a host may bring its own.
 
 ## Records
 
@@ -62,8 +62,59 @@ English, and a test holds that none is left out.
 ## Runtime
 
 ES modules in erasable TypeScript (ES2024, `strict`, no Node or DOM types), with no dependencies. It runs as it
-is in Node 24, and in any bundler that strips types. Its own tests are in `test/` (`npm run test:core`), at 98%
+is in Node 24, and in any bundler that strips types. Its own tests are in `test/` (`npm test`), at 98%
 of branches or more.
 
-`test/engine-outputs.js` is its output check for other engines: `npm run check:engines` (scripts/engines.mjs)
+`test/engine-outputs.js` is its output check for other engines: `npm run check:engines` (scripts/outputs.mjs)
 bundles it and runs it in Node, JavaScriptCore and SpiderMonkey, and every output must be the same text in all three.
+
+## Using it
+
+The library is TypeScript source with no build step: a host loads the `.ts` files as they are (Node 24 strips the
+types; a bundler such as esbuild does too). Mount it as a git submodule:
+
+```sh
+git submodule add https://github.com/AaronFilson/glazecalc-core lib/core
+```
+
+Its `package.json` names the package `@glazecalc/core` and maps its indexes in `exports`, for a host that resolves
+it as a package. It is not on npm yet.
+
+## Versions
+
+`0.x` until a second app uses it: [Glazecalc](https://github.com/AaronFilson/glazecalc) does now, and Glaze Vault will. Its main branch is always
+releasable, because hosts follow it.
+
+**The API**, which only a major version may rename or remove (a minor one while `0.x`):
+
+- the exports of each index (`index.ts`, and those of `chemistry`, `recipe`, `recipe/basics` and `cones`);
+- the problem, warning and message codes, and their values;
+- the trait keys;
+- the host argument's shape (`Host`, `Readers`, `Policy`);
+- the record shape the core reads, and its kinds;
+- `WORK`, the most work a search may do.
+
+Any change to a number the library gives or holds gets a line in the CHANGELOG: none is silent. The output
+snapshot (`test/outputs.json`) makes such a change visible: `npm run check:outputs` fails until it is kept with
+`node scripts/outputs.mjs --write`.
+
+## Checks
+
+```sh
+npm ci
+npm test                 # node:test, with the coverage threshold
+npm run typecheck        # TypeScript 6 and 7
+npm run lint && npm run format:check
+npm run check:outputs    # every output against the kept snapshot
+npm run check:engines    # the same outputs in Node, JavaScriptCore and SpiderMonkey (npx esvu install jsc, spidermonkey)
+```
+
+## History
+
+It began in [Glazecalc](https://github.com/AaronFilson/glazecalc) as `lib/core`, and this repository keeps its commits from there. Their messages
+name Glazecalc's pull requests in full, as `AaronFilson/glazecalc#152`. What came before, in Glazecalc's `lib/chemistry`,
+`lib/recipe` and `lib/cones`, is in Glazecalc's history.
+
+## Licence
+
+MIT (`LICENSE`).
