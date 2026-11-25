@@ -10,6 +10,11 @@ updates:
     # gets here. Security updates do not wait.
     cooldown:
       default-days: 7
+    ignore:
+      # TypeScript 6 is checked as typescript and 7 as typescript7 (npm run typecheck): a major of typescript
+      # would drop 6, and typescript-eslint takes 7 only from a later release. The alias moves on its own.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
     groups:
       lint-and-format:
         patterns: ['eslint', '@eslint/*', 'typescript-eslint', 'globals', 'prettier']
