@@ -11,6 +11,7 @@ import type { LimitTable } from './recipe/limits.ts';
 import type { StullChart } from './recipe/analysis.ts';
 import type { DensityTable } from './recipe/density.ts';
 import type { ConeFitPolicy } from './recipe/cone-fit.ts';
+import type { BodyTable } from './body/types.ts';
 
 /**
  * How the core reads a host's records. A reader left out is the default: the record's own `id`; its
@@ -48,6 +49,8 @@ export interface Host extends Readers {
   readonly densities: DensityTable;
   /** Each oxide's coefficient of expansion per weight percent: the catalog's EXPANSION (lib/catalog/expansion.ts), or a host's own. */
   readonly expansion: Readonly<Record<string, number>>;
+  /** Clay-body classes, slip SG ranges, class densities and check thresholds: the catalog's BODIES (lib/catalog/bodies.ts), or a host's own. */
+  readonly bodies: BodyTable;
   /** Its own choices: the catalog's POLICY (lib/catalog/policy.ts), or a host's own. */
   readonly policy: Policy;
 }

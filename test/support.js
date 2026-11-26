@@ -18,6 +18,7 @@ const HOST = Object.freeze({
   stull: tables.stull,
   densities: tables.densities,
   expansion: tables.expansion,
+  bodies: tables.bodies,
   policy: tables.policy
 });
 

@@ -8,6 +8,8 @@ export * from './plain.ts';
 export * from './problem.ts';
 export * from './traits.ts';
 export * from './types.ts';
+export * from './body/types.ts';
 export * as chemistry from './chemistry/index.ts';
 export * as recipe from './recipe/index.ts';
 export * as cones from './cones/index.ts';
+export * as body from './body/index.ts';

@@ -5,7 +5,7 @@
 import { HOST, MATERIALS, ADDITIVES, GLOSSY, IDS, linesOf } from './support.js';
 import * as core from '../index.ts';
 
-const { chemistry, recipe, cones } = core;
+const { chemistry, recipe, cones, body } = core;
 
 /** What a call gives, or what it threw: its code and values, or for an error with no code its name and message. */
 const run = (work) => {
@@ -197,10 +197,74 @@ export function* outputs() {
         toReach: [1.2, 1.45, 1.7].map((target) => run(() => recipe.waterToReach(5, sg, target, dry))),
         forBatch: run(() => recipe.waterForBatch(1000, sg, dry)),
         forVolume: run(() => recipe.batchForVolume(10, sg, dry)),
+        waterPer100: run(() => recipe.waterPer100(sg, dry)),
+        sgBack: run(() => {
+          const w = recipe.waterPer100(sg, dry);
+          return w === null ? null : recipe.sgFromWaterPer100(w, dry);
+        }),
         baume: run(() => recipe.baumeFromSg(sg)),
         pint: run(() => recipe.pintFromSg(sg))
       }))
     ];
+
+  yield [
+    'body',
+    {
+      porcelain: run(() =>
+        body.calculateBody(HOST, [
+          { material: find(IDS.epk), amount: 50 },
+          { material: find(IDS.custer), amount: 25 },
+          { material: find(IDS.silica), amount: 25 }
+        ])
+      ),
+      zeroFluxSlip: run(() =>
+        body.calculateBody(HOST, [
+          { material: { id: 'kaolin-th', formula: { Al2O3: 1, SiO2: 2, H2O: 2 } }, amount: 50 },
+          { material: find(IDS.silica), amount: 50 }
+        ])
+      ),
+      makeup: run(() =>
+        body.bodyMakeup(HOST, [
+          { material: find(IDS.epk), amount: 50 },
+          { material: find(IDS.custer), amount: 25 },
+          { material: find(IDS.silica), amount: 25 }
+        ])
+      ),
+      solidsSg: run(() => recipe.bodySolidsSg(HOST, linesOf(GLOSSY))),
+      waterBasis: [20, 25].map((w) => [recipe.convertWaterBasis(w, 'dry'), recipe.convertWaterBasis(w, 'wet')]),
+      bars: run(() =>
+        body.barResults({
+          mark: '100',
+          dry: '94',
+          fired: '88',
+          firedWeight: '50',
+          soakedWeight: '51',
+          suspendedWeight: '30',
+          bow: '0.5',
+          sag: '1.5'
+        })
+      ),
+      vitrification: run(() => {
+        const pts = body.vitrification(HOST, [
+          { cone: '04', absorption: 14, totalShrinkage: 6 },
+          { cone: '6', absorption: 1.5, totalShrinkage: 11.5 },
+          { cone: '10', absorption: 0.4, totalShrinkage: 13 }
+        ]);
+        return { points: pts, range: body.maturityRange(pts, { absorption: { max: 2 } }) };
+      }),
+      slipMix: run(() => body.slipMixTotals('380', [{ deflocculant: '3.5', water: '20' }], '1000')),
+      days: body.daysBetween('2026-11-20', '2026-11-25'),
+      checks: run(() =>
+        body.bodyChecks(HOST, {
+          bodyClass: 'porcelain',
+          forming: 'casting',
+          expansion: 6.1,
+          dryingShrinkage: 8.2,
+          makeup: { plastic: 35, nonPlastic: 65, plasticizer: 1.0, silica: 15, unknown: [] }
+        })
+      )
+    }
+  ];
 
   for (const scale of cones.SCALES) {
     const choices = run(() => cones.coneChoices(HOST, scale));

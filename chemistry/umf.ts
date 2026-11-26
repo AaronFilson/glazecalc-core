@@ -172,4 +172,4 @@ const calculateUMF = function (
   };
 };
 
-export { calculateUMF, readLine };
+export { calculateUMF, readLine, recipeLines };

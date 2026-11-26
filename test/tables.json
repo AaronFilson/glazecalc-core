@@ -1352,7 +1352,9 @@
    "potassium dichromate": 2.68,
    "minium": 8.9,
    "hydrocerussite": 6.8,
-   "litharge": 9.35
+   "litharge": 9.35,
+   "kyanite": 3.61,
+   "pyrophyllite": 2.81
   },
   "kinds": {
    "feldspar": 2.6,
@@ -1413,6 +1415,161 @@
     "max": 8
    },
    "colorants": 0.5
+  }
+ },
+ "bodies": {
+  "classes": {
+   "terra cotta": {
+    "coneRange": [
+     "08",
+     "02"
+    ],
+    "absorption": {
+     "min": 5,
+     "max": 15
+    },
+    "shrinkage": {
+     "min": 7,
+     "max": 11
+    }
+   },
+   "white earthenware": {
+    "coneRange": [
+     "06",
+     "2"
+    ],
+    "absorption": {
+     "min": 6,
+     "max": 12
+    },
+    "shrinkage": {
+     "min": 6,
+     "max": 10
+    }
+   },
+   "stoneware": {
+    "coneRange": [
+     "5",
+     "10"
+    ],
+    "absorption": {
+     "min": 0.5,
+     "max": 3
+    },
+    "shrinkage": {
+     "min": 10,
+     "max": 14
+    }
+   },
+   "porcelain": {
+    "coneRange": [
+     "6",
+     "13"
+    ],
+    "absorption": {
+     "min": 0,
+     "max": 0.5
+    },
+    "shrinkage": {
+     "min": 11,
+     "max": 16
+    }
+   },
+   "flameware": {
+    "coneRange": [
+     "6",
+     "11"
+    ],
+    "absorption": {
+     "min": 1,
+     "max": 6
+    },
+    "shrinkage": {
+     "min": 7,
+     "max": 11
+    }
+   },
+   "sculpture or raku": {
+    "coneRange": [
+     "08",
+     "10"
+    ],
+    "absorption": {
+     "min": 4,
+     "max": 15
+    },
+    "shrinkage": {
+     "min": 5,
+     "max": 10
+    }
+   },
+   "paper clay": {
+    "coneRange": [
+     "06",
+     "10"
+    ],
+    "absorption": {
+     "min": 1,
+     "max": 15
+    },
+    "shrinkage": {
+     "min": 6,
+     "max": 14
+    }
+   }
+  },
+  "slipRanges": {
+   "slip": {
+    "sg": {
+     "min": 1.35,
+     "max": 1.55
+    }
+   },
+   "engobe": {
+    "sg": {
+     "min": 1.4,
+     "max": 1.6
+    }
+   },
+   "casting slip": {
+    "sg": {
+     "min": 1.72,
+     "max": 1.84
+    }
+   },
+   "terra sigillata": {
+    "sg": {
+     "min": 1.12,
+     "max": 1.2
+    }
+   }
+  },
+  "classDensities": {
+   "ball clay": 2.6,
+   "kaolin": 2.6,
+   "fire clay": 2.6,
+   "stoneware clay": 2.6,
+   "earthenware clay": 2.6,
+   "plasticizer": 2.5,
+   "feldspar": 2.6,
+   "nepheline syenite": 2.61,
+   "silica": 2.65,
+   "talc": 2.75,
+   "wollastonite": 2.9,
+   "grog": 2.6,
+   "refractory": 3.2,
+   "deflocculant": 2.6,
+   "flocculant": 2.6,
+   "other": 2.6
+  },
+  "checks": {
+   "porcelainSilicaMin": 20,
+   "maxDryingShrinkage": 7.5,
+   "castingPlasticRange": [
+    40,
+    60
+   ],
+   "castingPlasticizerMax": 0.5
   }
  }
 }
