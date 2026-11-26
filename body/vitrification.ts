@@ -30,10 +30,13 @@ export interface VitrificationPoint {
 function coneSortKey(host: Pick<Host, 'cones'>, scale: ConeScale, cone: string): number {
   const chart = ordinal(host as Host, scale, cone);
   if (!Number.isNaN(chart)) return chart;
-  const first = /^\s*\^?\s*(0?)(\d+(?:\.\d+)?)/.exec(cone);
+  const trimmed = cone.trimStart();
+  const bare = trimmed.startsWith('^') ? trimmed.slice(1).trimStart() : trimmed;
+  const first = /^\d+(?:\.\d+)?/.exec(bare);
   if (!first) return Infinity;
-  const value = Number(first[2]);
-  return first[1] === '0' ? -value : value;
+  const token = first[0];
+  const value = Number(token);
+  return token.length > 1 && token.startsWith('0') && token[1] !== '.' ? -value : value;
 }
 
 const within = (value: number, range: RangeBound): boolean =>

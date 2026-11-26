@@ -1,6 +1,6 @@
 {
   "name": "@glazecalc/core",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Glaze and clay-body chemistry with no state, no tables and no words: unity and alumina formulas, fitting, limits, cone fit, swaps, Solve, blends, test bars, vitrification, density and cost, each taking its host.",
   "license": "MIT",
   "author": "Aaron Filson / Candling Development Studio",

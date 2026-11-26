@@ -88,7 +88,7 @@ releasable, because hosts follow it.
 
 **The API**, which only a major version may rename or remove (a minor one while `0.x`):
 
-- the exports of each index (`index.ts`, and those of `chemistry`, `recipe`, `recipe/basics` and `cones`);
+- the exports of each index (`index.ts`, and those of `chemistry`, `recipe`, `recipe/basics`, `cones` and `body`);
 - the problem, warning and message codes, and their values;
 - the trait keys;
 - the host argument's shape (`Host`, `Readers`, `Policy`);

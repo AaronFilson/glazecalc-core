@@ -3,6 +3,10 @@
 Every change to the API (README, Versions) and every change to a number the library gives or holds has a line
 here.
 
+## 0.2.1 (2026-11-25)
+
+Replaces two backtracking regular expressions (`plain.ts`, `body/vitrification.ts`) with linear-time equivalents; no accepted inputs or outputs change.
+
 ## 0.2.0 (2026-11-25)
 
 Adds clay-body, slip and test-bar calculations (`@glazecalc/core/body`) and body/slip slurry and solids-density helpers.
