@@ -89,6 +89,33 @@ const sgFromPint = (ounces: number): number => ounces / 20;
 /** The ounces an imperial pint weighs at an SG. */
 const pintFromSg = (sg: number): number => sg * 20;
 
+/**
+ * Grams of water per 100 g of dry solids for a slurry of specific gravity `sg` whose solids have
+ * density `dry` g/cm³, from SG = (100 + W) ÷ (100 ÷ dry + W). Null outside (1, dry).
+ */
+function waterPer100(sg: number, dry = 2.6): number | null {
+  return valid(sg, dry) ? (100 * (1 - sg / dry)) / (sg - 1) : null;
+}
+
+/**
+ * Specific gravity of a slurry mixed with `water` g of water per 100 g of dry solids of density
+ * `dry` g/cm³. Null unless `water > 0` and `dry > 1`.
+ */
+function sgFromWaterPer100(water: number, dry = 2.6): number | null {
+  if (!Number.isFinite(water) || water <= 0 || !Number.isFinite(dry) || dry <= 1) return null;
+  return (100 + water) / (100 / dry + water);
+}
+
+/**
+ * Converts a body's water figure between `g per 100 g dry` (`from: 'dry'`) and `% of the wet clay`
+ * (`from: 'wet'`). Null when `water <= 0` or a wet percentage is `>= 100`.
+ */
+function convertWaterBasis(water: number, from: 'dry' | 'wet'): number | null {
+  if (!Number.isFinite(water) || water <= 0) return null;
+  if (from === 'wet') return water < 100 ? (100 * water) / (100 - water) : null;
+  return (100 * water) / (100 + water);
+}
+
 export {
   LITRES,
   dryPerLitre,
@@ -100,5 +127,8 @@ export {
   sgFromBaume,
   baumeFromSg,
   sgFromPint,
-  pintFromSg
+  pintFromSg,
+  waterPer100,
+  sgFromWaterPer100,
+  convertWaterBasis
 };

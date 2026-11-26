@@ -1,10 +1,11 @@
 import { labelOf } from '../identity.ts';
+import { givenNumber } from '../plain.ts';
 import { traitsOf } from '../traits.ts';
 import { amountOf } from './amounts.ts';
 import type { Amount } from './amounts.ts';
 import { oxidesPerGram } from './materials.ts';
 import type { MaterialInput, Oxides } from '../types.ts';
-import type { Host } from '../host.ts';
+import type { Host, Readers } from '../host.ts';
 
 // The dry specific gravity (true particle density, g/cm³) of a glaze material
 // and of a recipe, for Brongniart's formula (slurry.js). Every value, with the
@@ -24,8 +25,8 @@ import type { Host } from '../host.ts';
 // - anything else (a material of the potter's own, a blend of minerals whose
 //   shares are unknown, a pigment of unknown crystal form) has no estimate.
 
-/** How an estimate was got: a mineral's measured density, a kind's (feldspars, clays), a glass's oxides, or none. */
-export type SgBasis = 'mineral' | 'kind' | 'glass' | 'none';
+/** How an estimate was got: a data sheet's figure, a mineral's measured density, a kind's (feldspars, clays), a glass's oxides, or none. */
+export type SgBasis = 'sheet' | 'mineral' | 'kind' | 'glass' | 'none';
 
 export interface MaterialSg {
   sg: number | null;
@@ -120,6 +121,9 @@ const round = (value: number): number => Math.round(value * 100) / 100;
 function materialSg(host: Host, material: SgMaterial): MaterialSg {
   const known = material ? traitsOf(host, material).density : undefined;
   if (known && typeof known === 'object') {
+    if (typeof known.sg === 'number' && Number.isFinite(known.sg) && known.sg > 1) {
+      return { sg: round(known.sg), basis: 'sheet', source: 'sheet' };
+    }
     const key = known.mineral;
     if (key === null) return { sg: null, basis: 'none', reason: known.reason ?? WHY_NOT.unknown };
     if (Object.hasOwn(host.densities.kinds, key)) return { sg: host.densities.kinds[key]!, basis: 'kind', source: key };
@@ -182,4 +186,58 @@ function recipeDrySg(host: Host, lines: ReadonlyArray<SgMaterial & { amount?: Am
   };
 }
 
-export { WHY_NOT, MOST_UNKNOWN_SHARE, glassDensity, materialSg, recipeDrySg };
+const DEFAULT_SOLIDS_SG = 2.6;
+
+/**
+ * The density of a body or slip material's solids (g/cm³): its data sheet's figure, then a class
+ * density explicitly set on a potter's unclassified-mineral material or its measured/kind/glass SG
+ * (materialSg), then its class's typical density (host.bodies.classDensities), then `defaultSg`.
+ */
+function lineSolidsSg(
+  host: Pick<Host, 'oxides' | 'densities' | 'bodies'> & Readers,
+  material: SgMaterial | null | undefined,
+  defaultSg = DEFAULT_SOLIDS_SG
+): number {
+  const sheetSg = givenNumber(material?.sheet?.density);
+  if (sheetSg !== null && Number.isFinite(sheetSg) && sheetSg > 1) return sheetSg;
+  const traits = traitsOf(host, material);
+  const traitSg = traits.density?.sg;
+  if (typeof traitSg === 'number' && Number.isFinite(traitSg) && traitSg > 1) return traitSg;
+  const measured = material ? materialSg(host as Host, material).sg : null;
+  if (measured !== null) return measured;
+  const cls = traits.materialClass;
+  if (cls && Object.hasOwn(host.bodies.classDensities, cls)) return host.bodies.classDensities[cls];
+  return defaultSg;
+}
+
+/**
+ * Volume-weighted solids density (g/cm³) of a body or slip recipe, falling back per line to its
+ * sheet, mineral/glass/kind SG, class density or `defaultSg`. `worked` is false when no line has a
+ * positive amount.
+ */
+function bodySolidsSg(
+  host: Pick<Host, 'oxides' | 'densities' | 'bodies'> & Readers,
+  lines: ReadonlyArray<SgMaterial & { amount?: Amount }>,
+  defaultSg = DEFAULT_SOLIDS_SG
+): { sg: number; worked: boolean } {
+  let weight = 0;
+  let volume = 0;
+  for (const line of lines ?? []) {
+    const grams = amountOf(line.amount);
+    if (!(Number.isFinite(grams) && grams > 0)) continue;
+    weight += grams;
+    volume += grams / lineSolidsSg(host, line, defaultSg);
+  }
+  return volume > 0 ? { sg: weight / volume, worked: true } : { sg: defaultSg, worked: false };
+}
+
+export {
+  WHY_NOT,
+  MOST_UNKNOWN_SHARE,
+  DEFAULT_SOLIDS_SG,
+  glassDensity,
+  materialSg,
+  recipeDrySg,
+  lineSolidsSg,
+  bodySolidsSg
+};

@@ -2,7 +2,7 @@
 // "12.5" or "-3", and nothing Number() would read beyond it, such as "12,5", "1e3", "0x10" or "Infinity".
 // The chemistry (umf.ts, materials.ts) and the recipes read numbers by it.
 
-const PLAIN = /^-?\d*\.?\d+$/;
+const PLAIN = /^-?(?:\d+(?:\.\d+)?|\.\d+)$/;
 
 /**
  * A number saved plainly ("12.5", "-3"); null for anything else, such as

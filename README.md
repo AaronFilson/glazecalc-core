@@ -9,13 +9,14 @@ It knows no material by name and keeps nothing between calls: what it needs come
 
 Import from an index, never a file inside the library (Glazecalc holds itself to this with an ESLint rule):
 
-| Index                    | What it has                                                                                                                                                                    |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `index.ts`               | the host's shape, identities, problems, traits and record types; each area as a namespace (`chemistry`, `recipe`, `cones`), since a name such as `unityOf` is in more than one |
-| `chemistry/index.ts`     | unity formulas, fitting and selecting, oxides, lead, expansion                                                                                                                 |
-| `recipe/index.ts`        | everything about recipes                                                                                                                                                       |
-| `recipe/basics/index.ts` | a finer index: plain numbers, the record shape, amounts, a recipe's materials, density                                                                                         |
-| `cones/index.ts`         | firing blocks and the cone charts' order, bands and conversions                                                                                                                |
+| Index                    | What it has                                                                                                                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `index.ts`               | the host's shape, identities, problems, traits and record types; each area as a namespace (`chemistry`, `recipe`, `cones`, `body`), since a name such as `unityOf` is in more than one |
+| `chemistry/index.ts`     | unity formulas, fitting and selecting, oxides, lead, expansion                                                                                                                         |
+| `recipe/index.ts`        | everything about recipes                                                                                                                                                               |
+| `recipe/basics/index.ts` | a finer index: plain numbers, the record shape, amounts, a recipe's materials, density                                                                                                 |
+| `cones/index.ts`         | firing blocks and the cone charts' order, bands and conversions                                                                                                                        |
+| `body/index.ts`          | clay bodies, slips and test bars: zero-flux-capable chemistry (`Al2O3 = 1`), plastic : non-plastic makeup, SHAB/ASTM C373 bars, vitrification curves, sheet comparison, checks         |
 
 A CommonJS `require` of an index takes all of it into a bundle, so the finer indexes let a page take only what
 it needs.
@@ -28,7 +29,7 @@ arguments always give the same answer, in any realm: a page, a worker, a test.
 - **Readers** (all optional): `idOf`, `labelOf`, `keyOf` and `traitsOf`. A reader left out is the default: the
   record's own `id`, its identity as its label, its identity and chemistry as the same-material key, and its own
   `traits`.
-- **Tables**: `oxides`, `cones`, `limits`, `stull`, `densities`, `expansion`.
+- **Tables**: `oxides`, `cones`, `limits`, `stull`, `densities`, `expansion`, `bodies`.
 - **Policy**: the markets each region's library also lists, and cone fit's margins and cut-offs.
 
 The catalog ([glazecalc-catalog](https://github.com/AaronFilson/glazecalc-catalog)) has Glazecalc's tables; a host may bring its own.
@@ -87,7 +88,7 @@ releasable, because hosts follow it.
 
 **The API**, which only a major version may rename or remove (a minor one while `0.x`):
 
-- the exports of each index (`index.ts`, and those of `chemistry`, `recipe`, `recipe/basics` and `cones`);
+- the exports of each index (`index.ts`, and those of `chemistry`, `recipe`, `recipe/basics`, `cones` and `body`);
 - the problem, warning and message codes, and their values;
 - the trait keys;
 - the host argument's shape (`Host`, `Readers`, `Policy`);

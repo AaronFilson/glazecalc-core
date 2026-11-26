@@ -6,10 +6,31 @@
 
 import type { Readers } from './host.ts';
 
-/** A material's mineral for its dry specific gravity (recipe/density.ts), or null with why there is none. */
+/** How a body or slip formulator classifies a material. */
+export type MaterialClass =
+  | 'ball clay'
+  | 'kaolin'
+  | 'fire clay'
+  | 'stoneware clay'
+  | 'earthenware clay'
+  | 'plasticizer'
+  | 'feldspar'
+  | 'nepheline syenite'
+  | 'silica'
+  | 'talc'
+  | 'wollastonite'
+  | 'grog'
+  | 'refractory'
+  | 'deflocculant'
+  | 'flocculant'
+  | 'other';
+
+/** A material's mineral or data-sheet figure for its dry specific gravity (recipe/density.ts), or null with why there is none. */
 export interface DensityTrait {
   mineral: string | null;
   reason?: string;
+  /** Explicit true particle density (g/cm³) from a supplier's data sheet. */
+  sg?: number;
 }
 
 /** What the core needs to know about a record beyond its chemistry; a flag left out is false. */
@@ -31,10 +52,16 @@ export interface Traits {
   /** The standard clay and silica the lead-free rebuild falls back on. */
   readonly defaultClay?: boolean;
   readonly defaultSilica?: boolean;
-  /** The mineral for its dry SG. */
+  /** What class of body or slip material a record is. */
+  readonly materialClass?: MaterialClass;
+  /** A swelling clay or plasticizer (bentonite, hectorite, veegum, macaloid). */
+  readonly plasticizer?: boolean;
+  /** A potter's own material whose class has not yet been given. */
+  readonly unclassified?: boolean;
+  /** The mineral or data-sheet figure for its dry SG. */
   readonly density?: DensityTrait | null;
   /** Which colorant an additive is (chrome, pink, iron, copper, antimony, ...): true for each it is. */
-  readonly [colorant: string]: boolean | DensityTrait | null | undefined;
+  readonly [colorant: string]: boolean | DensityTrait | MaterialClass | null | undefined;
 }
 
 const recordTraits = (record: { traits?: Traits }): Traits => (record && record.traits) || {};

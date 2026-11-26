@@ -28,6 +28,43 @@ export interface MaterialField {
   amountUnity?: number;
 }
 
+/** Fired test-bar figures at a stated cone or temperature (°C) on a supplier's data sheet. */
+export interface FiredReading {
+  readonly cone?: string;
+  readonly celsius?: number;
+  readonly firingShrinkage?: number | string;
+  readonly totalShrinkage?: number | string;
+  readonly absorption?: number | string;
+  readonly brightness?: number | string;
+}
+
+/** Physical properties on a material's data sheet, beyond its oxide analysis. */
+export interface DataSheet {
+  readonly cone?: string;
+  /** Percent of a bar's plastic length. */
+  readonly dryingShrinkage?: number | string;
+  /** Dry-to-fired shrinkage (%), or total contraction when the sheet gives one fired figure. */
+  readonly firingShrinkage?: number | string;
+  /** Wet-to-fired linear contraction (%). */
+  readonly totalShrinkage?: number | string;
+  /** Water taken up by the fired bar (%). */
+  readonly absorption?: number | string;
+  /** Percent water of the dry weight that makes it plastic. */
+  readonly waterOfPlasticity?: number | string;
+  /** Percent of particles finer than 1 µm. */
+  readonly finer1um?: number | string;
+  /** Percent of particles finer than 2 µm. */
+  readonly finer2um?: number | string;
+  /** Sieve residue or particle size as the sheet writes it ("0.5% on 325 mesh"). */
+  readonly mesh?: string;
+  /** Dry modulus of rupture with its unit ("300 psi", "7.0 MN/m²"). */
+  readonly dryStrength?: string;
+  /** True particle density of the solids, g/cm³. */
+  readonly density?: number | string;
+  /** Multi-temperature or multi-cone fired figures on a standard data sheet. */
+  readonly fired?: readonly FiredReading[];
+}
+
 /** A material as a molar formula, a weight-percent analysis, or the stored { fields, percentmole, loi } shape. */
 export interface MaterialInput {
   id?: unknown;
@@ -38,6 +75,7 @@ export interface MaterialInput {
   loi?: number | string | null;
   molecularweight?: number | string | null;
   equivalent?: number | string | null;
+  sheet?: DataSheet;
   [more: string]: unknown;
 }
 
